@@ -177,7 +177,7 @@
 /* #define OUTBOUND_NETWORK 0 */
 
 /* enable by default, -O disables: */
-/* #define OUTBOUND_NETWORK 1 */
+#define OUTBOUND_NETWORK 1
 
 
 /******************************************************************************

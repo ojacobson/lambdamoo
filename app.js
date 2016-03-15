@@ -1,10 +1,13 @@
 "use strict";
 
+var net = require('net');
 var http = require('http');
 var express = require('express');
 var socketIo = require('socket.io');
 
 var port = process.env.PORT || 5000;
+var mooHost = process.env.MOO_HOST || '127.0.0.1';
+var mooPort = process.env.MOO_PORT;
 
 var app = express();
 var server = http.Server(app);
@@ -17,7 +20,17 @@ server.listen(port, function() {
 });
 
 io.on('connection', function(socket) {
-  socket.emit('test', {
-    test: "Hello."
+  var tcp = new net.Socket();
+
+  tcp.connect(mooPort, mooHost);
+  tcp.on('data', function(data) {
+    socket.emit('output', data.toString());
+  });
+  tcp.on('close', function() {
+    socket.disconnect();
+  });
+
+  socket.on('disconnect', function() {
+    tcp.destroy();
   });
 });

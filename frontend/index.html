@@ -17,15 +17,20 @@
     <![endif]-->
   </head>
   <body>
-    <h1>moo.</h1>
+    <div class="container">
+      <h1>moo.</h1>
+      <pre id="terminal"></pre>
+    </div>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script>
       var socket = io.connect('/');
-      socket.on('test', function (data) {
-        console.log("Socket message:", data);
+
+      socket.on('output', function (data) {
+        $term = $('#terminal');
+        $term.text($term.text() + data);
       });
     </script>
   </body>

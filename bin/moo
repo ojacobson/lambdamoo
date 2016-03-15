@@ -1,0 +1,3 @@
+#!/bin/bash -e
+
+exec server/moo database/bootstrap.db database/snapshot.db -p ${MOO_PORT}

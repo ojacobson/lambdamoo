@@ -19,7 +19,7 @@
   <body>
     <div class="container">
       <h1>moo.</h1>
-      <pre id="terminal"></pre>
+      <div id="terminal"></div>
       <form id="input">
         <input class="form-control" type="text" id="line" autofocus>
       </form>
@@ -27,13 +27,26 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/0.3.5/marked.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script>
       var socket = io.connect();
+      var output = "";
+      var markedOptions = {
+        gfm: true,
+        breaks: true,
+        sanitize: true,
+        smartypants: true,
+      };
 
       socket.on('output', function (data) {
-        var $term = $('#terminal');
-        $term.text($term.text() + data);
+        output = output + data;
+        var markup = marked(output, markedOptions);
+        $('#terminal').html(markup);
+      });
+
+      $('html').click(function() {
+        $('#line').focus();
       });
 
       $('#input').submit(function() {

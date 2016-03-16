@@ -33,4 +33,8 @@ io.on('connection', function(socket) {
   socket.on('disconnect', function() {
     tcp.destroy();
   });
+  socket.on('line', function(line) {
+    tcp.write(line);
+    tcp.write('\n');
+  });
 });

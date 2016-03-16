@@ -20,17 +20,29 @@
     <div class="container">
       <h1>moo.</h1>
       <pre id="terminal"></pre>
+      <form id="input">
+        <input class="form-control" type="text" id="line" autofocus>
+      </form>
     </div>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script>
-      var socket = io.connect('/');
+      var socket = io.connect();
 
       socket.on('output', function (data) {
-        $term = $('#terminal');
+        var $term = $('#terminal');
         $term.text($term.text() + data);
+      });
+
+      $('#input').submit(function() {
+        var $this = $(this);
+        var line = $('#line', $this).val();
+
+        socket.emit('line', line);
+        $this.trigger('reset');
+        return false;
       });
     </script>
   </body>

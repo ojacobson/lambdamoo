@@ -1,0 +1,23 @@
+#!/bin/bash -e
+
+die() {
+    echo "$@" >&2
+    exit 1
+}
+
+[ -z "${CORE_BUCKET}" ] && die "CORE_BUCKET not set"
+
+for CORE; do
+ 	TEMP_CORE=$(mktemp)
+	trap 'rm -f "${TEMP_CORE}*"' EXIT
+
+	bin/s3 get "${CORE_BUCKET}/latest.hash" "${TEMP_CORE}.hash"
+	HASH=$(< "${TEMP_CORE}.hash")
+
+	URL="${CORE_BUCKET}/core-${HASH}.db"
+
+	bin/s3 get "${URL}" "${CORE}"
+
+	rm -f "${TEMP_CORE}*"
+	trap EXIT
+done

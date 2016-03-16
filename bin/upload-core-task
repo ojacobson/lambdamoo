@@ -1,0 +1,6 @@
+#!/bin/bash -e
+
+while true; do
+	sleep "${CORE_UPLOAD_PERIOD:-3600}"
+	bin/upload-core database/snapshot.db
+done

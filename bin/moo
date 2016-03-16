@@ -1,3 +1,10 @@
 #!/bin/bash -e
 
-exec server/moo database/bootstrap.db database/snapshot.db -p ${MOO_PORT}
+if bin/download-core database/restore.db; then
+	CORE=database/restore.db
+else
+	CORE=database/bootstrap.db
+fi
+
+trap 'bin/upload-core database/snapshot.db' EXIT
+server/moo "${CORE}" database/snapshot.db -p "${MOO_PORT}"

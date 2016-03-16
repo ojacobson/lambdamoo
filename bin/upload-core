@@ -1,0 +1,25 @@
+#!/bin/bash -e
+
+die() {
+    echo "$@" >&2
+    exit 1
+}
+
+[ -z "${CORE_BUCKET}" ] && die "CORE_BUCKET not set"
+
+for CORE; do
+  # in case the MOO dumps while we're processing this core, make a copy and work
+  # from that. 
+ 	TEMP_CORE=$(mktemp)
+	trap 'rm -f "${TEMP_CORE}*"' EXIT
+	cp "${CORE}" "${TEMP_CORE}"
+
+	HASH=$(openssl dgst -sha256 < "${TEMP_CORE}" | tee "${TEMP_CORE}.hash")
+	URL="${CORE_BUCKET}/core-${HASH}.db"
+
+	bin/s3 put "${URL}" "${TEMP_CORE}"
+	bin/s3 put "${CORE_BUCKET}/latest.hash" "${TEMP_CORE}.hash"
+
+	rm -f "${TEMP_CORE}*"
+	trap EXIT
+done

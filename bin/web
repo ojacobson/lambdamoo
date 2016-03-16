@@ -60,6 +60,14 @@ echo "Starting LambdaMOO server..." >&2
     wait
 ) & pids+=($!)
 
+echo "Starting background snapshot uploader..." >&2
+(
+    trap 'echo "moo" >&3;' EXIT
+    trap 'kill -TERM $! 2> /dev/null' TERM
+    bin/upload-core-task &
+    wait
+) & pids+=($!)
+
 echo "Starting Socket.IO proxy..." >&2
 (
     trap 'echo "app.js" >&3;' EXIT

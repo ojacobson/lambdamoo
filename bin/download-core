@@ -8,6 +8,7 @@ die() {
 [ -z "${CORE_BUCKET}" ] && die "CORE_BUCKET not set"
 
 for CORE; do
+	echo "Attempting to download latest core to ${CORE}"
  	TEMP_CORE=$(mktemp)
 	trap 'rm -f "${TEMP_CORE}*"' EXIT
 

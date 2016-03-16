@@ -8,6 +8,8 @@ die() {
 [ -z "${CORE_BUCKET}" ] && die "CORE_BUCKET not set"
 
 for CORE; do
+	echo "Saving ${CORE} to S3 as latest core."
+
   # in case the MOO dumps while we're processing this core, make a copy and work
   # from that. 
  	TEMP_CORE=$(mktemp)

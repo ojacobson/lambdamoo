@@ -1,8 +1,10 @@
 #!/bin/bash -e
 
 if bin/download-core database/restore.db; then
+	echo "Restored core from S3."
 	CORE=database/restore.db
 else
+	echo "Bootstrapping with new core."
 	CORE=database/bootstrap.db
 fi
 

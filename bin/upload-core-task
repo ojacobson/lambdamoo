@@ -2,5 +2,5 @@
 
 while true; do
 	sleep "${CORE_UPLOAD_PERIOD:-3600}"
-	bin/upload-core database/snapshot.db
+	[ -e database/snapshot.db ] && bin/upload-core database/snapshot.db
 done

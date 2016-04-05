@@ -9,4 +9,13 @@ else
 fi
 
 trap 'bin/upload-core database/snapshot.db' EXIT
-server/moo "${CORE}" database/snapshot.db -p "${MOO_PORT}"
+
+# HACK HACK HACK - Heroku sends SIGTERM to the whole process group, which screws
+# up the timing of the final database upload. Terminating this script causes the
+# upload to start immediately, even if the MOO server is still shutting down.
+#
+# Suppressing the signal here (well, propagating it to the server process)
+# instead allows the cleanup to happen after the MOO has shut down.
+server/moo "${CORE}" database/snapshot.db -p "${MOO_PORT}" &
+trap "kill -TERM $!; wait" TERM
+wait

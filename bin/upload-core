@@ -24,4 +24,6 @@ for CORE; do
 
 	rm -f "${TEMP_CORE}*"
 	trap EXIT
+
+	echo "Saved ${CORE} to S3."
 done

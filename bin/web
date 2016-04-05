@@ -23,7 +23,18 @@ pids=()
 # of the subshells may be gone 3b) || true so that set -e doesn't cause a mess
 # if the kill returns 1 on "no such process" cases (which is likely) 4) exit in
 # case we're handling SIGQUIT or SIGTERM
-trap 'trap - QUIT TERM EXIT; echo "Going down, terminating child processes..." >&2; rm -f ${wait_pipe} || true; kill -TERM "${pids[@]}" 2> /dev/null || true; exit' QUIT TERM EXIT
+shutdown() {
+	trap - QUIT TERM EXIT
+	echo "Going down, terminating child processes..." >&2
+	rm -f ${wait_pipe}
+	kill -TERM "${pids[@]}" 2> /dev/null || true
+	for pid in "${pids[@]}"; do
+		wait "${pid}" || true
+	done
+	exit 0
+}
+
+trap 'shutdown' QUIT TERM EXIT
 # if FD 1 is a TTY (that's the -t 1 check), trap SIGINT/Ctrl+C
 # 1) restore the INT trap so it doesn't fire in a loop due to 2)
 # 2) be nice to the caller and send SIGINT to ourselves (http://mywiki.wooledge.org/SignalTrap#Special_Note_On_SIGINT)
@@ -55,7 +66,7 @@ fi
 echo "Starting LambdaMOO server..." >&2
 (
     trap 'echo "moo" >&3;' EXIT
-    trap 'kill -TERM $! 2> /dev/null' TERM
+    trap 'kill -TERM $! 2> /dev/null; wait' TERM
     bin/moo &
     wait
 ) & pids+=($!)
@@ -63,7 +74,7 @@ echo "Starting LambdaMOO server..." >&2
 echo "Starting background snapshot uploader..." >&2
 (
     trap 'echo "moo" >&3;' EXIT
-    trap 'kill -TERM $! 2> /dev/null' TERM
+    trap 'kill -TERM $! 2> /dev/null; wait' TERM
     bin/upload-core-task &
     wait
 ) & pids+=($!)
@@ -71,7 +82,7 @@ echo "Starting background snapshot uploader..." >&2
 echo "Starting Socket.IO proxy..." >&2
 (
     trap 'echo "app.js" >&3;' EXIT
-    trap 'kill -TERM $! 2> /dev/null' TERM
+    trap 'kill -TERM $! 2> /dev/null; wait' TERM
     bin/app &
     wait
 ) & pids+=($!)

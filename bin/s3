@@ -34,6 +34,11 @@ s3simple() {
     md5=""
     args="-o $file"
     ;;
+  head)
+    method="HEAD"
+    md5=""
+    args="--head -o /dev/null"
+    ;;
   put)
     method="PUT"
     if [ ! -f "$file" ]; then

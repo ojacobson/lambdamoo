@@ -19,7 +19,11 @@ for CORE; do
 	HASH=$(shasum -a 256 "${TEMP_CORE}" | cut -c -64 | tee "${TEMP_CORE}.hash")
 	URL="${CORE_BUCKET}/core-${HASH}.db"
 
-	bin/s3 put "${URL}" "${TEMP_CORE}"
+	# Assume prior uploads have succeeded if a content-identical core already
+	# exists
+	if ! bin/s3 head "${URL}"; then
+		bin/s3 put "${URL}" "${TEMP_CORE}"
+	fi
 	bin/s3 put "${CORE_BUCKET}/latest.hash" "${TEMP_CORE}.hash"
 
 	rm -f "${TEMP_CORE}*"
